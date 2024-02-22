@@ -1,0 +1,6 @@
+22:17:30.604 main                       d.cyklon.batterymanager.TibberClient #<init>                   L36    TibberClient         INFO   {"data":{"viewer":{"homes":[{"subscriptions":[{"priceInfo":{"current":{"total":0.2864}}}]}]}}}
+
+22:19:12.145 main                       d.c.batterymanager.api.TibberClient  #<init>                   L34    TibberClient         INFO   {"errors":[{"message":"Field \"current\" of type \"Price\" must have a selection of subfields. Did you mean \"current { ... }\"?","extensions":{"code":"GRAPHQL_VALIDATION_FAILED"}}]}
+
+22:19:40.197 main                       d.c.batterymanager.api.TibberClient  #<init>                   L41    TibberClient         INFO   {"data":{"viewer":{"homes":[{"subscriptions":[{"priceInfo":{"current":{"total":0.2864,"energy":0.1351,"tax":0.1513,"startsAt":"2024-02-22T22:00:00.000+01:00","currency":"SEK","level":"VERY_CHEAP"}}}]}]}}}
+
