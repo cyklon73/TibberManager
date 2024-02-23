@@ -1,6 +1,7 @@
 package de.cyklon.tibbermanager.api;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,45 +19,66 @@ public class TibberClient {
     public TibberClient(String token) throws IOException {
         this.token = token;
         this.client = new OkHttpClient();
-
-        String query = """
-                homes {
-                    subscriptions {
-                        priceInfo {
-                            current {
-                                total
-                                energy
-                                tax
-                                startsAt
-                                currency
-                                level
-                            }
-                        }
-                    }
-                }
-                """;
-
-
-
-        logger.info(sendQuery(query));
     }
 
-    public String sendQuery(String query) throws IOException {
-        JsonObject json = new JsonObject();
-        json.addProperty("query", "{\nviewer {\n%s\n}\n}".formatted(query));
+    public int sendPushNotification(String tile, String message, AppScreen screenToOpen) throws IOException {
+        JsonObject response = sendMutation("""
+                sendPushNotification(input: {
+                    title: "%s",
+                    message: "%s",
+                    screenToOpen: %s
+                  }) {
+                    successful
+                    pushedToNumberOfDevices
+                  }
+                """.formatted(tile, message, screenToOpen)).getAsJsonObject("data").getAsJsonObject("sendPushNotification");
 
-        Request request = new Request.Builder()
-                .url(API_ENDPOINT)
-                .addHeader("Authorization", "Bearer " + token)
-                .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json.toString()))
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
+        if (!response.get("successful").getAsBoolean()) return -1;
+        return response.get("pushedToNumberOfDevices").getAsInt();
+    }
+
+    public JsonObject sendMutation(String mutation) throws IOException {
+        return jsonResponse(sendRequest(postRequest(query("""
+                mutation {
+                  %s
         }
+        """.formatted(mutation)))));
+    }
+
+    public JsonObject sendQuery(String query) throws IOException {
+        return jsonResponse(sendRequest(postRequest(query("{\nviewer {\n%s\n}\n}".formatted(query)))));
+    }
+
+    private Response sendRequest(Request request) throws IOException {
+        return client.newCall(request).execute();
     }
 
     public Logger getLogger() {
         return logger;
+    }
+
+    private Request postRequest(String json) {
+        return builder()
+            .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json))
+            .build();
+    }
+
+    private Request.Builder builder() {
+        return new Request.Builder()
+            .url(API_ENDPOINT)
+            .addHeader("Authorization", "Bearer " + token);
+    }
+
+    public static String query(String query) {
+        JsonObject json = new JsonObject();
+        json.addProperty("query", query);
+        return json.toString();
+    }
+
+    private static JsonObject jsonResponse(Response response) throws IOException {
+        try (response) {
+            return JsonParser.parseString(response.body().string()).getAsJsonObject();
+        }
     }
 
 }
