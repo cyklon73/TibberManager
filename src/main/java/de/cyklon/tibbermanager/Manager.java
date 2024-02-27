@@ -12,6 +12,12 @@ import java.io.*;
 
 public class Manager {
 
+    public static JsonObject CONFIG = ConfigHandler.loadConfig();
+
+    public static void reloadConfig() {
+        CONFIG = ConfigHandler.loadConfig();
+    }
+
     public static void main(String[] args) throws IOException {
         new Manager();
         new CLI();
