@@ -107,6 +107,11 @@ public class CLI {
 		commands.add(Command.printCommand("help", "Displays all commands with their aliases and their description", () -> helpMsg, "h"));
 		commands.add(Command.promptCommand("config", "Opens the Config menu", configPrompt, configHandler, true, () -> System.out.println(titleConfig)));
 		commands.add(Command.consumerCommand("clear", "Clears the entire console", p -> clear(true), "cl"));
+		commands.add(Command.placeholder("start", "Start the HTTP Client"));
+		commands.add(Command.placeholder("stop", "Stop the HTTP Client"));
+		commands.add(Command.placeholder("restart", "Restart the HTTP Client"));
+		commands.add(Command.placeholder("status", "Shows the current Status of the HTTP Client"));
+		commands.add(Command.placeholder("reload", "Reload the Config"));
 		commands.add(Command.consumerCommand("exit", "Shuts down all running processes and closes TibberManger", p -> shutdown()));
 
 		helpMsg = "    " + pad(pad("Name", 15) + "Aliases", 50) + "Description\n\n"
